@@ -1,0 +1,74 @@
+version: "1.0"
+policies:
+  # ==============================================================================
+  # Kural 1: ISO 27001:2022 Madde A.5.17 (ISO 27001:2013 A.9.4.2)
+  # Parola Karmaşıklığı ve Asgari Uzunluk Politikası
+  # ==============================================================================
+  - id: "ISO-A.9.4.2"
+    control_id: "A.5.17"
+    title: "Parola Karmaşıklığı ve Asgari Uzunluk Politikası"
+    description: "Uygulama ve servis yapılandırma dosyalarında tanımlanan parola politikasının en az 12 karakter uzunluğunda olduğunu ve varsayılan/zayıf parolaların yer almadığını denetler."
+    category: "Organizational Controls"
+    severity: "HIGH"
+    enabled: true
+    tags:
+      - "authentication"
+      - "passwords"
+      - "credentials"
+      - "security_baseline"
+    remediation: "Parola asgari uzunluğunu en az 12 karakter olarak güncelleyin ve yapılandırma dosyalarında açık metin veya varsayılan parolalar bırakmayın."
+    spec:
+      target_type: "file"
+      match_files:
+        - "*auth*.json"
+        - "*auth*.yaml"
+        - "*security*.yaml"
+        - "*security*.json"
+        - "*password*.yaml"
+        - "*password*.json"
+        - "*identity*.yaml"
+        - "*identity*.json"
+      exclude_files:
+        - "tsconfig*.json"
+        - "jsconfig*.json"
+        - "package*.json"
+        - "package-lock.json"
+        - "node_modules/**"
+      assertions:
+        - type: "regex_match"
+          pattern: "(?i)min[-_]?password[-_]?(len|length)?\\s*[:=]\\s*(\\d+)"
+          min_value: 12
+          message: "Parola asgari uzunluğu güvenlik standartları gereği en az 12 karakter olmalıdır."
+        - type: "disallow_patterns"
+          patterns:
+            - "(?i)password\\s*[:=]\\s*['\"]?(admin|123456|password|root|toor|12345678)['\"]?"
+          message: "Yapılandırma dosyasında varsayılan veya zayıf parola tanımları tespit edildi."
+
+  # ==============================================================================
+  # Kural 2: ISO 27001:2022 Madde A.8.28 (ISO 27001:2013 A.14.2.1)
+  # Kaynak Kod Branch Koruma ve Değişiklik Yönetimi Politikası
+  # ==============================================================================
+  - id: "ISO-A.8.28-BRANCH-PROTECTION"
+    control_id: "A.8.28"
+    title: "Kaynak Kod Branch Koruma ve Değişiklik Yönetimi Politikası"
+    description: "Doğrudan yetkisiz kod gönderimini engellemek ve kod inceleme süreçlerini zorunlu kılmak için depoda CODEOWNERS veya onaylı CI/CD iş akışlarının varlığını denetler."
+    category: "Technological Controls"
+    severity: "HIGH"
+    enabled: true
+    tags:
+      - "git"
+      - "branch_protection"
+      - "secure_coding"
+      - "change_management"
+    remediation: "Deponun kök dizinine veya .github/ klasörüne CODEOWNERS dosyası ekleyin ve ana dala doğrudan push yapılmasını kısıtlayarak en az bir onaylı PR gereksinimi koyun."
+    spec:
+      target_type: "git"
+      alternative_files:
+        - ".github/CODEOWNERS"
+        - "CODEOWNERS"
+        - ".github/workflows"
+        - ".gitlab-ci.yml"
+        - ".gitea/workflows"
+      assertions:
+        - type: "file_exists"
+          message: "Depo üzerinde kod sahipliği (CODEOWNERS) veya CI/CD doğrulama iş akışları tanımlanmalıdır."

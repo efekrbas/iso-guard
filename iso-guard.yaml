@@ -1,0 +1,61 @@
+# ==============================================================================
+# ISO-Guard: ISO/IEC 27001:2022 Technical Controls Auditor Configuration
+# ==============================================================================
+
+# Audit profile standard
+profile: "iso-27001-2022"
+
+# Target configuration
+target:
+  path: "."
+  type: "directory"
+  # Directories excluded from filesystem scans
+  exclude_dirs:
+    - ".git"
+    - "node_modules"
+    - "vendor"
+    - ".idea"
+    - ".vscode"
+    - "dist"
+    - "build"
+
+# Rule execution policies
+rules:
+  # Path to external YAML policy definitions or directories
+  policies_path: "policies"
+
+  # Minimum severity level to evaluate: CRITICAL, HIGH, MEDIUM, LOW, INFO
+  min_severity: "LOW"
+
+  # Exit with error code 1 if findings with this severity or higher occur (useful in CI/CD)
+  fail_on_severity: "HIGH"
+
+  # Explicit rules or controls to include (empty means evaluate all eligible)
+  # Example: ["A.8.12", "ISO-A.8.24-PRIVATE-KEYS"]
+  include: []
+
+  # Explicit rules or controls to exclude
+  exclude: []
+
+  # Categories to include (e.g. "Technological Controls", "Organizational Controls")
+  include_categories: []
+
+# Target scanner modules toggles
+scanners:
+  enable_filesystem: true
+  enable_system: true
+  enable_network: false
+
+# Report output configuration
+report:
+  # Format options: console, json, markdown
+  format: "console"
+  
+  # File destination (leave empty for stdout)
+  output_file: ""
+  
+  # Enable terminal colors
+  color: true
+  
+  # Verbose debug output
+  verbose: false
